@@ -34,6 +34,8 @@ from .calibration import (
     calculate_baseline_stress,
     decode_base64_frame,
 )
+from .repository import PsiRepository
+from .service import PsiService, get_active_monitor, clear_active_monitor
 
 __all__ = [
     "calculate_stress_from_emotions",
@@ -53,4 +55,8 @@ __all__ = [
     "get_last_features",
     "calculate_baseline_stress",
     "decode_base64_frame",
+    "PsiRepository",
+    "PsiService",
+    "get_active_monitor",
+    "clear_active_monitor",
 ]

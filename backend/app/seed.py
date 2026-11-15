@@ -1,6 +1,10 @@
+from datetime import datetime, timezone
 from sqlalchemy import select
 from .db import Base, engine, SessionLocal
-from .models import BodySystem, HealthChallenge, HealthEducation, MissionEnvironment
+from .models import (
+    BodySystem, HealthChallenge, HealthEducation, MissionEnvironment,
+    Mission, Astronaut, AstronautPsiBaseline, utcnow
+)
 
 BODY = [
  ("brain","Brain & nervous system","Coordinates cognition, sensory processing and nervous-system activity.",["eeg_features","reaction_time","cognitive_accuracy"],["Use the cognitive assessment to record performance; discuss persistent concerns with qualified medical staff."]),
@@ -51,6 +55,21 @@ def _populate(db):
           MissionEnvironment(mission_id=1,env_type="station",name="Orbital research station",duration_days=30,location="Low Earth orbit (simulated)",context={"gravity":"microgravity (simulated)"},streams=["heart_rate","hrv","eda","sleep","activity"]),
           MissionEnvironment(mission_id=1,env_type="rover",name="Lunar surface traverse",duration_days=7,location="Lunar surface (simulated)",context={"gravity":"lunar (simulated)"},streams=["activity","sleep","mood"]),
           MissionEnvironment(mission_id=1,env_type="base",name="Lunar habitat",duration_days=90,location="Lunar base (simulated)",context={"gravity":"lunar (simulated)"},streams=["heart_rate","sleep","activity","mood"]),
+        ])
+    if not db.scalars(select(Mission)).first():
+        db.add_all([
+            Mission(id=1, name="Artemis Base Alpha", code="ABA-01", status="active", description="Lunar south pole expedition", start_date=utcnow()),
+            Mission(id=2, name="Ares Deep Space Transit", code="ADS-02", status="planned", description="Long-duration Mars orbital analog mission"),
+        ])
+    if not db.scalars(select(Astronaut)).first():
+        db.add_all([
+            Astronaut(id=1, name="Dr. Sarah Walker", callsign="Nova", role="Mission Commander", status="active", current_mission_id=1, biometric_profile={"age": 38, "resting_hr": 58, "vo2_max": 48.5}),
+            Astronaut(id=2, name="Mark Kelly", callsign="Atlas", role="Flight Engineer", status="active", current_mission_id=1, biometric_profile={"age": 42, "resting_hr": 62, "vo2_max": 46.0}),
+        ])
+    if not db.scalars(select(AstronautPsiBaseline)).first():
+        db.add_all([
+            AstronautPsiBaseline(astronaut_id=1, is_calibrated=True, baseline_stress=22.0, baseline_sigma=4.5, optimal_range_low=18.4, optimal_range_high=28.75),
+            AstronautPsiBaseline(astronaut_id=2, is_calibrated=True, baseline_stress=26.0, baseline_sigma=5.0, optimal_range_low=22.0, optimal_range_high=33.5),
         ])
     db.commit()
 
